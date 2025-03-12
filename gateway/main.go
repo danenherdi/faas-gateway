@@ -209,6 +209,11 @@ func main() {
 	r.HandleFunc("/function/{name:["+NameExpression+"]+}/", functionProxy)
 	r.HandleFunc("/function/{name:["+NameExpression+"]+}/{params:.*}", functionProxy)
 
+	// Flows
+	r.HandleFunc("/flow/{name:["+NameExpression+"]+}", functionProxy)
+	r.HandleFunc("/flow/{name:["+NameExpression+"]+}/", functionProxy)
+	r.HandleFunc("/flow/{name:["+NameExpression+"]+}/{params:.*}", functionProxy)
+
 	r.HandleFunc("/system/info", faasHandlers.InfoHandler).Methods(http.MethodGet)
 	r.HandleFunc("/system/telemetry", faasHandlers.TelemetryHandler).Methods(http.MethodGet)
 
@@ -220,6 +225,9 @@ func main() {
 	r.HandleFunc("/system/functions", faasHandlers.DeleteFunction).Methods(http.MethodDelete)
 	r.HandleFunc("/system/functions", faasHandlers.UpdateFunction).Methods(http.MethodPut)
 	r.HandleFunc("/system/scale-function/{name:["+NameExpression+"]+}", faasHandlers.ScaleFunction).Methods(http.MethodPost)
+
+	// Flows API
+	r.HandleFunc("/system/flows", handlers.MakeForwardingProxyHandler(reverseProxy, forwardingNotifiers, urlResolver, nilURLTransformer, serviceAuthInjector))
 
 	r.HandleFunc("/system/secrets", faasHandlers.SecretHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete)
 	r.HandleFunc("/system/logs", faasHandlers.LogProxyHandler).Methods(http.MethodGet)
